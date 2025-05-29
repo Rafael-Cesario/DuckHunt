@@ -9,4 +9,3 @@
 [ ] O alvo some quando tocar as bordas da tela e o jogador perde uma vida
 [ ] Calcular pontos
 [ ] Perder vidas
-
