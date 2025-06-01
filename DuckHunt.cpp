@@ -7,6 +7,9 @@
 
 void gerarInterfaceInicial();
 void tamparAlvo();
+void exibirVidas(int vidas);
+void exibirMunicao(int municao);
+void exibirAcertos(int acertos);
 
 
 int main ()
@@ -14,7 +17,8 @@ int main ()
     initwindow(JANELA_X, JANELA_Y, "Duck Hunt", 600, 100);
 
     gerarInterfaceInicial();
-    tamparAlvo();
+    // tamparAlvo();
+    // iniciarJogo();
 
 
     // Fecha a janela quando uma tecla for pressionada
@@ -26,45 +30,24 @@ int main ()
 
 void gerarInterfaceInicial()
 {
-    int i, x;
-
     // Timer
     setfillstyle(1, COLOR(20,20,20));
     bar(0, 0, JANELA_X, 30);
     setbkcolor(COLOR(20,20,20));
     outtextxy(300, 8, "01:00");
 
-
-
     // Alvo para iniciar o jogo
     setbkcolor(BLACK);
     outtextxy(224, 161, "Acerte o alvo para começar");
     readimagefile("Imagens/bullseye.jpg", 291, 190, 291 + 50, 190 + 50);
 
-
-    // Background
+    // Background na parte inferior
     setfillstyle(1, COLOR(20,20,20));
     bar(0, 370, JANELA_X, 370 + 110);
 
-    // Vidas
-    for (i = 0; i < 5; i++)
-    {
-        // O tamanho da imagem é somado a x, posicionando as imagens lado a lado.
-        x = 16 + (i * 32);
-        readimagefile("Imagens/heart.jpg", x, 393, x + 32, 393 + 32);
-    }
-
-    // Munição
-    for (i = 0; i < 5; i++)
-    {
-        // O tamanho da imagem é somado a x, posicionando as imagens lado a lado.
-        x = 16 + (i * 32);
-        readimagefile("Imagens/bullet.jpg", x, 430, x + 32, 430 + 32);
-    }
-
-    // Acertos
-    setbkcolor(COLOR(20, 20, 20));
-    outtextxy(552, 447, "Acertos: 0");
+    exibirVidas(5);
+    exibirMunicao(5);
+    exibirAcertos(0);
 }
 
 
@@ -117,7 +100,36 @@ void tamparAlvo()
     }
 }
 
+void exibirVidas(int vidas)
+{
+    int i, x;
 
+    for (i = 0; i < vidas; i++)
+    {
+        x = 16 + (i * 32);
+        readimagefile("Imagens/heart.jpg", x, 393, x + 32, 393 + 32);
+    }
+}
+
+void exibirMunicao(int municao)
+{
+    int i, x;
+
+    for (i = 0; i < municao; i++)
+    {
+        x = 16 + (i * 32);
+        readimagefile("Imagens/bullet.jpg", x, 430, x + 32, 430 + 32);
+    }
+}
+
+void exibirAcertos(int acertos)
+{
+    char text[11];
+
+    sprintf(text, "Acertos: %d", acertos);
+    setbkcolor(COLOR(20, 20, 20));
+    outtextxy(552, 447, text);
+}
 
 
 
