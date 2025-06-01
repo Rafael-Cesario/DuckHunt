@@ -11,6 +11,7 @@ void exibirVidas(int vidas);
 void exibirMunicao(int municao);
 void exibirAcertos(int acertos);
 
+void timer();
 
 int main ()
 {
@@ -20,6 +21,8 @@ int main ()
     // tamparAlvo();
     // iniciarJogo();
 
+    tamparAlvo();
+    timer();
 
     // Fecha a janela quando uma tecla for pressionada
     getch();
@@ -38,7 +41,7 @@ void gerarInterfaceInicial()
 
     // Alvo para iniciar o jogo
     setbkcolor(BLACK);
-    outtextxy(224, 161, "Acerte o alvo para começar");
+    outtextxy(224, 161, "Acerte o alvo para comeï¿½ar");
     readimagefile("Imagens/bullseye.jpg", 291, 190, 291 + 50, 190 + 50);
 
     // Background na parte inferior
@@ -59,45 +62,32 @@ void tamparAlvo()
 
     while(1)
     {
-
-        getmouseclick(WM_LBUTTONDOWN,x,y);
-
-        if(x>=291&& x<=341 && y>=190 && y<=240)
+        if(ismouseclick(WM_LBUTTONDOWN))
         {
-            setfillstyle(SOLID_FILL,BLACK);
-            bar(224,161,200+224,100+161);
 
-            setbkcolor(BLACK);
-            outtextxy(250,161,"O jogo vai começar");
 
-            delay(2000);
+            getmouseclick(WM_LBUTTONDOWN,x,y);
 
-            //apaga a mensagem "o jogo vai começar"
-
-            bar(250,161,250+150,161+150);
-
-            //parte q faz o cronometro chegar a zero
-
-            char tempo[10];
-            int i;
-
-            for(i=59; i>=0; i--)
+            if(x>=291&& x<=341 && y>=190 && y<=240)
             {
+                setfillstyle(SOLID_FILL,BLACK);
+                bar(224,161,200+224,100+161);
 
-                setbkcolor(COLOR(20,20,20));
-                sprintf(tempo,"00:%02d",i);
+                setbkcolor(BLACK);
+                outtextxy(250,161,"O jogo vai comeï¿½ar");
 
-                outtextxy(300,8,tempo);
+                delay(2000);
 
-                delay(1000);
+                //apaga a mensagem "o jogo vai comeï¿½ar"
+
+                bar(250,161,250+150,161+150);
             }
 
-            setbkcolor(BLACK);
-            outtextxy(280,161,"Fim de jogo");
-
+            break;
 
         }
     }
+
 }
 
 void exibirVidas(int vidas)
@@ -131,5 +121,25 @@ void exibirAcertos(int acertos)
     outtextxy(552, 447, text);
 }
 
+void timer()
+{
 
+    //faz o timer ir a 0
 
+    char tempo[10];
+    int i;
+
+    for(i=59; i>=0; i--)
+    {
+
+        setbkcolor(COLOR(20,20,20));
+        sprintf(tempo,"00:%02d",i);
+
+        outtextxy(300,8,tempo);
+
+        delay(1000);
+    }
+
+    setbkcolor(BLACK);
+    outtextxy(280,161,"Fim de jogo");
+}
