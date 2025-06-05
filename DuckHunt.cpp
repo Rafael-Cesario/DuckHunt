@@ -11,11 +11,12 @@ typedef struct
     int x, y;
 } Elemento;
 
-void gerarInterfaceInicial();
-void timer();
-void exibirAcertos(int acertos);
 void exibir(Elemento item, int quantidade);
+void exibirAcertos(int acertos);
+void gerarInterfaceInicial();
 void aguardarInicio();
+void iniciarJogo();
+void timer();
 
 int main ()
 {
@@ -23,11 +24,37 @@ int main ()
 
     gerarInterfaceInicial();
     aguardarInicio();
+    iniciarJogo();
 
     getch();
     closegraph();
 
     return 0;
+}
+
+void gerarInterfaceInicial()
+{
+    Elemento vida = {"Imagens/heart.jpg", 16, 393};
+    Elemento municao = {"Imagens/bullet.jpg", 16, 430};
+
+    // Timer
+    setfillstyle(1, COLOR(20,20,20));
+    bar(0, 0, JANELA_X, 30);
+    setbkcolor(COLOR(20,20,20));
+    outtextxy(300, 8, "01:00");
+
+    // Alvo para iniciar o jogo
+    setbkcolor(BLACK);
+    outtextxy(224, 161, "Acerte o alvo para começar");
+    readimagefile("Imagens/bullseye.jpg", 291, 190, 291 + 50, 190 + 50);
+
+    // Background na parte inferior
+    setfillstyle(1, COLOR(20,20,20));
+    bar(0, 370, JANELA_X, 370 + 110);
+
+    exibir(vida, 5);
+    exibir(municao, 5);
+    exibirAcertos(0);
 }
 
 void aguardarInicio()
@@ -54,29 +81,15 @@ void aguardarInicio()
     }
 }
 
-void gerarInterfaceInicial()
+void iniciarJogo()
 {
-    Elemento vida = {"Imagens/heart.jpg", 16, 393};
-    Elemento municao = {"Imagens/bullet.jpg", 16, 430};
-
-    // Timer
-    setfillstyle(1, COLOR(20,20,20));
-    bar(0, 0, JANELA_X, 30);
-    setbkcolor(COLOR(20,20,20));
-    outtextxy(300, 8, "01:00");
-
-    // Alvo para iniciar o jogo
-    setbkcolor(BLACK);
-    outtextxy(224, 161, "Acerte o alvo para começar");
-    readimagefile("Imagens/bullseye.jpg", 291, 190, 291 + 50, 190 + 50);
-
-    // Background na parte inferior
-    setfillstyle(1, COLOR(20,20,20));
-    bar(0, 370, JANELA_X, 370 + 110);
-
-    exibir(vida, 5);
-    exibir(municao, 5);
-    exibirAcertos(0);
+    // Tarefas:
+    // - Mover o alvo pela tela.
+    // - Mais de um alvo ao mesmo tempo (se possivel).
+    // - Perder vidas quando o alvo tocar as bordas da tela ou as partes em cinza
+    // - Diminuir munições com os cliques
+    // - Quando as munições chegarem a zero, o jogador deverar ver uma
+    //   mensagem de recarregando, e esperar as munições voltarem para atirar novamente
 }
 
 void timer()
