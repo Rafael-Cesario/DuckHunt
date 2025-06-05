@@ -1,8 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <graphics.h>
-#include <time.h>
 #include <windows.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <math.h>
 
 #define JANELA_X 640
 #define JANELA_Y 480
@@ -19,11 +20,14 @@ typedef struct
 } Estado;
 
 void exibir(Elemento item, int quantidade);
-void exibirPontos(int acertos);
+void exibirPontos(int pontos);
 void atualizarTimer(int segundos);
 void gerarInterfaceInicial();
 void aguardarInicio();
 void iniciarJogo();
+void limparAlvos();
+void recarregarMunicao(int *jogoMunicao, Elemento *municao);
+void telaFinal();
 
 int main ()
 {
@@ -32,9 +36,7 @@ int main ()
     gerarInterfaceInicial();
     aguardarInicio();
     iniciarJogo();
-
-    // Tarefa:
-    // telaFinal();
+    telaFinal();
 
     getch();
     closegraph();
@@ -93,39 +95,44 @@ void aguardarInicio()
 
 void iniciarJogo()
 {
-    int i, clickX, clickY, tempoAlvo, tempoJogo = 59;
-
-    srand(time(NULL));
+    int clickX, clickY, tempoAlvo, totalAlvos = 0;
 
     Estado jogo = { 5, 5, 0 };
     Elemento alvo = {"Imagens/bullseye.jpg", 0, 0};
     Elemento vida = {"Imagens/heart.jpg", 16, 393};
     Elemento municao = {"Imagens/bullet.jpg", 16, 430};
 
+    srand(time(NULL));
+
     // Tarefa:
-    // Contar até 3 antes de começar a mostrar os alvos.
-    // ou "Preparar, apontar, já...".
+    // Exibir uma contagem regressiva na tela antes dos alvos começarem a aparecer
     // contagemRegressiva();
 
-    while(1)
+    // O jogo termina depois que 10 alvos aparecerem na tela
+    for(totalAlvos; totalAlvos < 10; totalAlvos++)
     {
-        if (tempoJogo < 1 || jogo.vidas == 0) break;
+        if (jogo.vidas == 0)
+        {
+            limparAlvos();
+            break;
+        };
+
+        if (jogo.municao == 0)
+            recarregarMunicao(&jogo.municao, &municao);
 
         // Gera um x e y, aleatório, considerando o limite da área e o tamanho do alvo
         alvo.x = rand() % (640 - 50);
         alvo.y = rand() % (370 - 50 - 30) + 30;
 
         // Limpa o alvo anterior, e posiciona um novo
-        setfillstyle(1, BLACK);
-        bar(0, 30, 640, 370);
+        limparAlvos();
         readimagefile(alvo.caminho, alvo.x, alvo.y, alvo.x + 50, alvo.y + 50);
 
+        // Tempo para o jogador tentar acertar o alvo: 0.5 segundos;
         tempoAlvo = 50;
 
-        // Enquanto houver tempo, ou o jogador não clicar
-        while (tempoAlvo >= 0 || !ismouseclick(WM_LBUTTONDOWN))
+        for(tempoAlvo; tempoAlvo >= 0; tempoAlvo--)
         {
-
             if (tempoAlvo == 0)
             {
                 // Perde uma vida por não acertar o alvo a tempo
@@ -143,7 +150,7 @@ void iniciarJogo()
                 exibir(municao, jogo.municao);
 
                 // Verifica se o clique foi dentro do alvo
-                if (clickX >= alvo.x && clickY >= alvo.y && clickX <= clickX + 50 && clickY + 50)
+                if (clickX >= alvo.x && clickY >= alvo.y && clickX <= alvo.x + 50 && clickY <= alvo.y + 50)
                 {
                     // Ganha um ponto por acertar
                     jogo.pontos++;
@@ -159,10 +166,21 @@ void iniciarJogo()
                 }
             }
 
-            tempoAlvo--;
+            // Um delay muito grande faz com que cliques rapidos não sejam capturados
             delay(10);
         }
     }
+}
+
+void telaFinal()
+{
+    // Tarefa:
+    // Tela Final
+
+    clearviewport();
+    setbkcolor(BLACK);
+    setfillstyle(1, WHITE);
+    outtextxy(10, 10, "O jogo terminou");
 }
 
 void atualizarTimer(int segundos)
@@ -190,10 +208,35 @@ void exibir(Elemento item, int quantidade)
     }
 }
 
-void exibirPontos(int acertos)
+void exibirPontos(int pontos)
 {
     char text[11];
-    sprintf(text, "Acertos: %d", acertos);
+    sprintf(text, "Acertos: %d", pontos);
     setbkcolor(COLOR(20, 20, 20));
     outtextxy(552, 447, text);
+}
+
+void limparAlvos()
+{
+    setfillstyle(1, BLACK);
+    bar(0, 30, 640, 370);
+}
+
+void recarregarMunicao(int *jogoMunicao, Elemento *municao)
+{
+    int i;
+    limparAlvos();
+
+    // Tarefa:
+    // Escrever na tela recarregando...
+
+    // Animação que aumenta a munição na tela
+    for (i = 0; i <= 5; i++)
+    {
+        exibir(*municao, i);
+        delay(200);
+    }
+
+    // Variavel para monitorar a municao durante o jogo
+    *jogoMunicao = 5;
 }

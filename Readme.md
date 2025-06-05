@@ -1,11 +1,8 @@
 # Tarefas
 
-- [x] Interface do Game
-- [ ] Timer de 1 minuto
-- [ ] Capturar posição do clique do mouse
-- [ ] Gastar munições com cliques
-- [ ] Carregar munições apertando R no teclado
-- [ ] Mover alvo pela tela
-- [ ] O alvo some quando tocar as bordas da tela e o jogador perde uma vida
-- [ ] Calcular pontos
-- [ ] Perder vidas
+- [ ] Exibir uma contagem regressiva na tela antes dos alvos começarem a aparecer
+- [ ] função recarregar Munição
+- [ ] Salvar pontuação da partida atual em um vetor e reiniciar a partida.
+- [ ] Depois de 5 partidas, mostrar a tela final com todas as pontuações.
+- [ ] Destacar a maior pontuação com uma cor de fundo.
+- [ ] Tela final
