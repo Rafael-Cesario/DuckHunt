@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <graphics.h>
-#include<windows.h>
+#include <time.h>
+#include <windows.h>
 
 #define JANELA_X 640
 #define JANELA_Y 480
@@ -11,12 +13,17 @@ typedef struct
     int x, y;
 } Elemento;
 
+typedef struct
+{
+    int vidas, municao, pontos;
+} Estado;
+
 void exibir(Elemento item, int quantidade);
-void exibirAcertos(int acertos);
+void exibirPontos(int acertos);
+void atualizarTimer(int segundos);
 void gerarInterfaceInicial();
 void aguardarInicio();
 void iniciarJogo();
-void timer();
 
 int main ()
 {
@@ -25,6 +32,9 @@ int main ()
     gerarInterfaceInicial();
     aguardarInicio();
     iniciarJogo();
+
+    // Tarefa:
+    // telaFinal();
 
     getch();
     closegraph();
@@ -54,7 +64,7 @@ void gerarInterfaceInicial()
 
     exibir(vida, 5);
     exibir(municao, 5);
-    exibirAcertos(0);
+    exibirPontos(0);
 }
 
 void aguardarInicio()
@@ -83,41 +93,96 @@ void aguardarInicio()
 
 void iniciarJogo()
 {
-    // Tarefas:
-    // - Mover o alvo pela tela.
-    // - Mais de um alvo ao mesmo tempo (se possivel).
-    // - Perder vidas quando o alvo tocar as bordas da tela ou as partes em cinza
-    // - Diminuir munições com os cliques
-    // - Quando as munições chegarem a zero, o jogador deverar ver uma
-    //   mensagem de recarregando, e esperar as munições voltarem para atirar novamente
+    int i, clickX, clickY, tempoAlvo, tempoJogo = 59;
+
+    srand(time(NULL));
+
+    Estado jogo = { 5, 5, 0 };
+    Elemento alvo = {"Imagens/bullseye.jpg", 0, 0};
+    Elemento vida = {"Imagens/heart.jpg", 16, 393};
+    Elemento municao = {"Imagens/bullet.jpg", 16, 430};
+
+    // Tarefa:
+    // Contar até 3 antes de começar a mostrar os alvos.
+    // ou "Preparar, apontar, já...".
+    // contagemRegressiva();
+
+    while(1)
+    {
+        if (tempoJogo < 1 || jogo.vidas == 0) break;
+
+        // Gera um x e y, aleatório, considerando o limite da área e o tamanho do alvo
+        alvo.x = rand() % (640 - 50);
+        alvo.y = rand() % (370 - 50 - 30) + 30;
+
+        // Limpa o alvo anterior, e posiciona um novo
+        setfillstyle(1, BLACK);
+        bar(0, 30, 640, 370);
+        readimagefile(alvo.caminho, alvo.x, alvo.y, alvo.x + 50, alvo.y + 50);
+
+        tempoAlvo = 50;
+
+        // Enquanto houver tempo, ou o jogador não clicar
+        while (tempoAlvo >= 0 || !ismouseclick(WM_LBUTTONDOWN))
+        {
+
+            if (tempoAlvo == 0)
+            {
+                // Perde uma vida por não acertar o alvo a tempo
+                jogo.vidas--;
+                exibir(vida, jogo.vidas);
+                break;
+            };
+
+            if (ismouseclick(WM_LBUTTONDOWN))
+            {
+                getmouseclick(WM_LBUTTONDOWN, clickX, clickY);
+                clearmouseclick(WM_LBUTTONDOWN);
+
+                jogo.municao--;
+                exibir(municao, jogo.municao);
+
+                // Verifica se o clique foi dentro do alvo
+                if (clickX >= alvo.x && clickY >= alvo.y && clickX <= clickX + 50 && clickY + 50)
+                {
+                    // Ganha um ponto por acertar
+                    jogo.pontos++;
+                    exibirPontos(jogo.pontos);
+                    break;
+                }
+                else
+                {
+                    // Perde uma vida por errar
+                    jogo.vidas--;
+                    exibir(vida, jogo.vidas);
+                    break;
+                }
+            }
+
+            tempoAlvo--;
+            delay(10);
+        }
+    }
 }
 
-void timer()
+void atualizarTimer(int segundos)
 {
-
-    //faz o timer ir a 0
-
-    char tempo[10];
-    int i;
-
-    for(i=59; i>=0; i--)
-    {
-
-        setbkcolor(COLOR(20,20,20));
-        sprintf(tempo,"00:%02d",i);
-
-        outtextxy(300,8,tempo);
-
-        delay(1000);
-    }
-
-    setbkcolor(BLACK);
-    outtextxy(280,161,"Fim de jogo");
+    char tempo[6];
+    setfillstyle(1, COLOR(20,20,20));
+    bar(0, 0, JANELA_X, 30);
+    setbkcolor(COLOR(20,20,20));
+    sprintf(tempo,"00:%02d", segundos);
+    outtextxy(300, 8, tempo);
 }
 
 void exibir(Elemento item, int quantidade)
 {
     int x, i = 0;
+
+    // Limpa as posições antes de exibir os elementos
+    setfillstyle(1, COLOR(20, 20, 20));
+    bar(item.x, item.y, item.x + 160, item.y + 32);
+
     for (i = 0; i < quantidade; i++)
     {
         x = item.x + (i * 32);
@@ -125,7 +190,7 @@ void exibir(Elemento item, int quantidade)
     }
 }
 
-void exibirAcertos(int acertos)
+void exibirPontos(int acertos)
 {
     char text[11];
     sprintf(text, "Acertos: %d", acertos);
