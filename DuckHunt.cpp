@@ -24,19 +24,21 @@ void exibirPontos(int pontos);
 void atualizarTimer(int segundos);
 void gerarInterfaceInicial();
 void aguardarInicio();
-void iniciarJogo();
 void limparAlvos();
 void recarregarMunicao(int *jogoMunicao, Elemento *municao);
-void telaFinal();
+void jogo(int *pontuacao);
+void iniciarJogo(int *pontuacao);
 
 int main ()
 {
+    int pontuacao[5] = {0, 0, 0, 0, 0};
+
     initwindow(JANELA_X, JANELA_Y, "Duck Hunt", 100, 100);
 
     gerarInterfaceInicial();
     aguardarInicio();
-    iniciarJogo();
-    telaFinal();
+    iniciarJogo(pontuacao);
+    // telaFinal(&pontuacao);
 
     getch();
     closegraph();
@@ -93,20 +95,39 @@ void aguardarInicio()
     }
 }
 
-void iniciarJogo()
+void iniciarJogo(int *pontuacao)
+{
+    int partidasTotal = 5, i;
+
+    for (i = 0; i < partidasTotal; i++)
+        jogo(&pontuacao[i]);
+
+    for (i = 0; i < 5; i++)
+        printf("Pontuacao %d: %d\n", i, pontuacao[i]);
+}
+
+void jogo(int *pontuacao)
 {
     int clickX, clickY, tempoAlvo, totalAlvos = 0;
 
     Estado jogo = { 5, 5, 0 };
+
     Elemento alvo = {"Imagens/bullseye.jpg", 0, 0};
     Elemento vida = {"Imagens/heart.jpg", 16, 393};
     Elemento municao = {"Imagens/bullet.jpg", 16, 430};
+
+    // Reseta a interface antes de cada partida
+    exibir(vida, jogo.vidas);
+    exibir(municao, jogo.municao);
+    exibirPontos(jogo.pontos);
 
     srand(time(NULL));
 
     // Tarefa:
     // Exibir uma contagem regressiva na tela antes dos alvos começarem a aparecer
     // contagemRegressiva();
+    limparAlvos();
+    delay(3000);
 
     // O jogo termina depois que 10 alvos aparecerem na tela
     for(totalAlvos; totalAlvos < 10; totalAlvos++)
@@ -166,10 +187,12 @@ void iniciarJogo()
                 }
             }
 
-            // Um delay muito grande faz com que cliques rapidos não sejam capturados
+            // Delay par diminuir o timer
             delay(10);
         }
     }
+
+    *pontuacao = jogo.pontos;
 }
 
 void telaFinal()
@@ -211,7 +234,8 @@ void exibir(Elemento item, int quantidade)
 void exibirPontos(int pontos)
 {
     char text[11];
-    sprintf(text, "Acertos: %d", pontos);
+
+    sprintf(text, "Acertos: %02d", pontos);
     setbkcolor(COLOR(20, 20, 20));
     outtextxy(552, 447, text);
 }
