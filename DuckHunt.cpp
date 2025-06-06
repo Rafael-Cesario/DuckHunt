@@ -25,9 +25,10 @@ void atualizarTimer(int segundos);
 void gerarInterfaceInicial();
 void aguardarInicio();
 void limparAlvos();
-void recarregarMunicao(int *jogoMunicao, Elemento *municao);
-void jogo(int *pontuacao);
+void recarregarMunicao(int *jogoMunicao, Elemento municao);
+void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao);
 void iniciarJogo(int *pontuacao);
+void telaFinal(int pontuacao[5]);
 
 int main ()
 {
@@ -38,7 +39,7 @@ int main ()
     gerarInterfaceInicial();
     aguardarInicio();
     iniciarJogo(pontuacao);
-    // telaFinal(&pontuacao);
+    telaFinal(pontuacao);
 
     getch();
     closegraph();
@@ -99,35 +100,36 @@ void iniciarJogo(int *pontuacao)
 {
     int partidasTotal = 5, i;
 
-    for (i = 0; i < partidasTotal; i++)
-        jogo(&pontuacao[i]);
-
-    for (i = 0; i < 5; i++)
-        printf("Pontuacao %d: %d\n", i, pontuacao[i]);
-}
-
-void jogo(int *pontuacao)
-{
-    int clickX, clickY, tempoAlvo, totalAlvos = 0;
-
-    Estado jogo = { 5, 5, 0 };
-
     Elemento alvo = {"Imagens/bullseye.jpg", 0, 0};
     Elemento vida = {"Imagens/heart.jpg", 16, 393};
     Elemento municao = {"Imagens/bullet.jpg", 16, 430};
 
-    // Reseta a interface antes de cada partida
-    exibir(vida, jogo.vidas);
-    exibir(municao, jogo.municao);
-    exibirPontos(jogo.pontos);
-
     srand(time(NULL));
 
-    // Tarefa:
-    // Exibir uma contagem regressiva na tela antes dos alvos começarem a aparecer
-    // contagemRegressiva();
-    limparAlvos();
-    delay(3000);
+    for (i = 0; i < partidasTotal; i++)
+    {
+        // Reseta a interface antes de cada partida
+        exibir(vida, 5);
+        exibir(municao, 5);
+        exibirPontos(0);
+
+        // Tarefa:
+        // Exibir uma contagem regressiva na tela antes dos alvos começarem a aparecer
+        // contagemRegressiva();
+        limparAlvos();
+
+        // Delay temporário, para simular a contagem regressiva
+        delay(3000);
+
+        jogo(&pontuacao[i], alvo, vida, municao);
+    }
+}
+
+void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
+{
+    int clickX, clickY, tempoAlvo, totalAlvos = 0;
+
+    Estado jogo = { 5, 5, 0 };
 
     // O jogo termina depois que 10 alvos aparecerem na tela
     for(totalAlvos; totalAlvos < 10; totalAlvos++)
@@ -139,7 +141,7 @@ void jogo(int *pontuacao)
         };
 
         if (jogo.municao == 0)
-            recarregarMunicao(&jogo.municao, &municao);
+            recarregarMunicao(&jogo.municao, municao);
 
         // Gera um x e y, aleatório, considerando o limite da área e o tamanho do alvo
         alvo.x = rand() % (640 - 50);
@@ -195,10 +197,13 @@ void jogo(int *pontuacao)
     *pontuacao = jogo.pontos;
 }
 
-void telaFinal()
+void telaFinal(int pontuacao[5])
 {
     // Tarefa:
     // Tela Final
+
+    for (int i = 0; i < 5; i++)
+        printf("Pontuacao %d: %d\n", i, pontuacao[i]);
 
     clearviewport();
     setbkcolor(BLACK);
@@ -246,7 +251,7 @@ void limparAlvos()
     bar(0, 30, 640, 370);
 }
 
-void recarregarMunicao(int *jogoMunicao, Elemento *municao)
+void recarregarMunicao(int *jogoMunicao, Elemento municao)
 {
     int i;
     limparAlvos();
@@ -257,7 +262,7 @@ void recarregarMunicao(int *jogoMunicao, Elemento *municao)
     // Animação que aumenta a munição na tela
     for (i = 0; i <= 5; i++)
     {
-        exibir(*municao, i);
+        exibir(municao, i);
         delay(200);
     }
 
