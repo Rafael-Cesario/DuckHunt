@@ -127,21 +127,15 @@ void iniciarJogo(int *pontuacao)
 
 void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
 {
-    int clickX, clickY, tempoAlvo, totalAlvos = 0;
+    int clickX, clickY, tempoAlvo, totalAlvos = 0, acertou = 0;
 
     Estado jogo = { 5, 5, 0 };
 
     // O jogo termina depois que 10 alvos aparecerem na tela
     for(totalAlvos; totalAlvos < 10; totalAlvos++)
     {
-        if (jogo.vidas == 0)
-        {
-            limparAlvos();
-            break;
-        };
-
-        if (jogo.municao == 0)
-            recarregarMunicao(&jogo.municao, municao);
+        if (jogo.vidas == 0) break;
+        if (jogo.municao == 0) recarregarMunicao(&jogo.municao, municao);
 
         // Gera um x e y, aleatório, considerando o limite da área e o tamanho do alvo
         alvo.x = rand() % (640 - 50);
@@ -152,16 +146,15 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
         readimagefile(alvo.caminho, alvo.x, alvo.y, alvo.x + 50, alvo.y + 50);
 
         // Tempo para o jogador tentar acertar o alvo: 0.5 segundos;
-        tempoAlvo = 50;
-
-        for(tempoAlvo; tempoAlvo >= 0; tempoAlvo--)
+        for(tempoAlvo = 50; tempoAlvo >= 0; tempoAlvo--)
         {
-            if (tempoAlvo == 0)
+            // Perde uma vida por não acertar o alvo a tempo
+            if (tempoAlvo == 0 && acertou == 0)
             {
-                // Perde uma vida por não acertar o alvo a tempo
                 jogo.vidas--;
                 exibir(vida, jogo.vidas);
-                break;
+
+                if (jogo.vidas == 0) break;
             };
 
             if (ismouseclick(WM_LBUTTONDOWN))
@@ -176,16 +169,18 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
                 if (clickX >= alvo.x && clickY >= alvo.y && clickX <= alvo.x + 50 && clickY <= alvo.y + 50)
                 {
                     // Ganha um ponto por acertar
+                    acertou = 1;
                     jogo.pontos++;
+                    limparAlvos();
                     exibirPontos(jogo.pontos);
-                    break;
                 }
                 else
                 {
                     // Perde uma vida por errar
                     jogo.vidas--;
                     exibir(vida, jogo.vidas);
-                    break;
+
+                    if (jogo.vidas == 0) break;
                 }
             }
 
