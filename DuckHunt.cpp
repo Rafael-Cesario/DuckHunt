@@ -127,7 +127,7 @@ void iniciarJogo(int *pontuacao)
 
 void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
 {
-    int clickX, clickY, tempoAlvo, totalAlvos = 0, acertou = 0;
+    int clickX, clickY, tempoAlvo, totalAlvos = 0, acertou;
 
     Estado jogo = { 5, 5, 0 };
 
@@ -135,7 +135,6 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
     for(totalAlvos; totalAlvos < 10; totalAlvos++)
     {
         if (jogo.vidas == 0) break;
-        if (jogo.municao == 0) recarregarMunicao(&jogo.municao, municao);
 
         // Gera um x e y, aleatório, considerando o limite da área e o tamanho do alvo
         alvo.x = rand() % (640 - 50);
@@ -145,9 +144,13 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
         limparAlvos();
         readimagefile(alvo.caminho, alvo.x, alvo.y, alvo.x + 50, alvo.y + 50);
 
+        acertou = 0;
+
         // Tempo para o jogador tentar acertar o alvo: 0.5 segundos;
         for(tempoAlvo = 50; tempoAlvo >= 0; tempoAlvo--)
         {
+            if (jogo.municao == 0) recarregarMunicao(&jogo.municao, municao);
+
             // Perde uma vida por não acertar o alvo a tempo
             if (tempoAlvo == 0 && acertou == 0)
             {
