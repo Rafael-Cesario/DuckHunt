@@ -79,20 +79,31 @@ void aguardarInicio()
     while (1)
     {
         // Mantem o jogo parado, esperando por um clique
-        while(!ismouseclick(WM_LBUTTONDOWN)) delay(10);
+        while(!ismouseclick(WM_LBUTTONDOWN))
+        delay(10);
 
         // Salva a posição do clique
         getmouseclick(WM_LBUTTONDOWN, clickX, clickY);
         clearmouseclick(WM_LBUTTONDOWN);
 
         // Verifica se o clique foi dentro do alvo
-        if (clickX >= 291 && clickX <= 341 && clickY >= 190 && clickY <= 240)
+
+        int centroX = 315;
+        int centroY = 215;
+        int x = clickX - centroX;
+        int y = clickY - centroY;
+
+        if(x*x + y*y <= 26*26)
         {
+
             // Tampa a mensagem inicial e o alvo
-            setfillstyle(1, BLACK);
+            setfillstyle(1,BLACK);
             bar(224, 161, 224 + 180, 161 + 100);
+            setfillstyle(1,BLACK);
             break;
         }
+
+
     }
 }
 
@@ -158,7 +169,7 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
                 exibir(vida, jogo.vidas);
 
                 if (jogo.vidas == 0) break;
-            };
+            }
 
             if (ismouseclick(WM_LBUTTONDOWN))
             {
@@ -254,8 +265,24 @@ void recarregarMunicao(int *jogoMunicao, Elemento municao)
     int i;
     limparAlvos();
 
-    // Tarefa:
     // Escrever na tela recarregando...
+
+        for(int pont = 0; pont< 3; pont++)
+        {
+            setbkcolor(BLACK);
+            char texto[30] = "RECARREGANDO";
+
+        for(int j = 0; j <= pont; j++)
+        {
+             strcat(texto," . ");
+
+             outtextxy(JANELA_X/2-60,JANELA_Y/2-50,texto);
+
+             delay(300);
+        }
+
+        }
+
 
     // Animação que aumenta a munição na tela
     for (i = 0; i <= 5; i++)
