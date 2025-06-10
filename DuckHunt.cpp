@@ -11,12 +11,15 @@
 typedef struct
 {
     char caminho[22];
-    int x, y;
+    int x;
+    int y;
 } Elemento;
 
 typedef struct
 {
-    int vidas, municao, pontos;
+    int vidas;
+    int municao;
+    int pontos;
 } Estado;
 
 void exibir(Elemento item, int quantidade);
@@ -29,6 +32,7 @@ void recarregarMunicao(int *jogoMunicao, Elemento municao);
 void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao);
 void iniciarJogo(int *pontuacao);
 void telaFinal(int pontuacao[5]);
+void executarRodada(Estado *jogo);
 
 int main ()
 {
@@ -74,42 +78,36 @@ void gerarInterfaceInicial()
 
 void aguardarInicio()
 {
-    int clickX, clickY;
+    int clickX, clickY, x, y, centroX = 315, centroY = 215;
+    int esperarClique = 1;
 
-    while (1)
+    while (esperarClique)
     {
         // Mantem o jogo parado, esperando por um clique
-        while(!ismouseclick(WM_LBUTTONDOWN))
-        delay(10);
+        while(!ismouseclick(WM_LBUTTONDOWN)) delay(10);
 
         // Salva a posição do clique
         getmouseclick(WM_LBUTTONDOWN, clickX, clickY);
         clearmouseclick(WM_LBUTTONDOWN);
 
         // Verifica se o clique foi dentro do alvo
+        x = clickX - centroX;
+        y = clickY - centroY;
 
-        int centroX = 315;
-        int centroY = 215;
-        int x = clickX - centroX;
-        int y = clickY - centroY;
-
-        if(x*x + y*y <= 26*26)
+        if( x * x + y * y <= 26 * 26)
         {
-
-            // Tampa a mensagem inicial e o alvo
+            // Remove a mensagem inicial e o alvo
             setfillstyle(1,BLACK);
             bar(224, 161, 224 + 180, 161 + 100);
             setfillstyle(1,BLACK);
             break;
         }
-
-
     }
 }
 
 void iniciarJogo(int *pontuacao)
 {
-    int partidasTotal = 5, i;
+    int partidasTotal = 5, partidaAtual;
 
     Elemento alvo = {"Imagens/bullseye.jpg", 0, 0};
     Elemento vida = {"Imagens/heart.jpg", 16, 393};
@@ -117,8 +115,11 @@ void iniciarJogo(int *pontuacao)
 
     srand(time(NULL));
 
-    for (i = 0; i < partidasTotal; i++)
+    for (partidaAtual = 0; partidaAtual < partidasTotal; partidaAtual++)
     {
+        // Tarefa:
+        // Mostrar a partida atual no topo da tela
+
         // Reseta a interface antes de cada partida
         exibir(vida, 5);
         exibir(municao, 5);
@@ -128,26 +129,25 @@ void iniciarJogo(int *pontuacao)
         // Exibir uma contagem regressiva na tela antes dos alvos começarem a aparecer
         // contagemRegressiva();
         limparAlvos();
-
         // Delay temporário, para simular a contagem regressiva
         delay(3000);
 
-        jogo(&pontuacao[i], alvo, vida, municao);
+        jogo(&pontuacao[partidaAtual], alvo, vida, municao);
     }
 }
 
 void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
 {
-    int clickX, clickY, tempoAlvo, totalAlvos = 0, acertou;
+    int tempoAlvo, totalAlvos, acertou;
+    int clickX, clickY;
 
     Estado jogo = { 5, 5, 0 };
 
-    // O jogo termina depois que 10 alvos aparecerem na tela
-    for(totalAlvos; totalAlvos < 10; totalAlvos++)
+    for(totalAlvos = 0; totalAlvos < 10; totalAlvos++)
     {
         if (jogo.vidas == 0) break;
 
-        // Gera um x e y, aleatório, considerando o limite da área e o tamanho do alvo
+        // Gera um x e y aleatório, considerando a área útil e o tamanho do alvo
         alvo.x = rand() % (640 - 50);
         alvo.y = rand() % (370 - 50 - 30) + 30;
 
@@ -155,15 +155,16 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
         limparAlvos();
         readimagefile(alvo.caminho, alvo.x, alvo.y, alvo.x + 50, alvo.y + 50);
 
+        // Para todo novo alvo em tela, o valor de acertou deverá ser falso;
         acertou = 0;
 
-        // Tempo para o jogador tentar acertar o alvo: 0.5 segundos;
-        for(tempoAlvo = 50; tempoAlvo >= 0; tempoAlvo--)
+        // Tempo para o jogador tentar acertar o alvo: 1 segundo
+        for(tempoAlvo = 100; tempoAlvo >= 0; tempoAlvo--)
         {
             if (jogo.municao == 0) recarregarMunicao(&jogo.municao, municao);
 
             // Perde uma vida por não acertar o alvo a tempo
-            if (tempoAlvo == 0 && acertou == 0)
+            if (acertou == 0 && tempoAlvo == 0)
             {
                 jogo.vidas--;
                 exibir(vida, jogo.vidas);
@@ -198,7 +199,7 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
                 }
             }
 
-            // Delay par diminuir o timer
+            // Delay para diminuir o tempoAlvo
             delay(10);
         }
     }
@@ -218,16 +219,6 @@ void telaFinal(int pontuacao[5])
     setbkcolor(BLACK);
     setfillstyle(1, WHITE);
     outtextxy(10, 10, "O jogo terminou");
-}
-
-void atualizarTimer(int segundos)
-{
-    char tempo[6];
-    setfillstyle(1, COLOR(20,20,20));
-    bar(0, 0, JANELA_X, 30);
-    setbkcolor(COLOR(20,20,20));
-    sprintf(tempo,"00:%02d", segundos);
-    outtextxy(300, 8, tempo);
 }
 
 void exibir(Elemento item, int quantidade)
@@ -262,33 +253,29 @@ void limparAlvos()
 
 void recarregarMunicao(int *jogoMunicao, Elemento municao)
 {
-    int i;
+    int quantidade, pont;
+
     limparAlvos();
 
     // Escrever na tela recarregando...
-
-        for(int pont = 0; pont< 3; pont++)
-        {
-            setbkcolor(BLACK);
-            char texto[30] = "RECARREGANDO";
+    for(pont = 0; pont < 3; pont++)
+    {
+        setbkcolor(BLACK);
+        char texto[30] = "RECARREGANDO";
 
         for(int j = 0; j <= pont; j++)
         {
-             strcat(texto," . ");
-
-             outtextxy(JANELA_X/2-60,JANELA_Y/2-50,texto);
-
-             delay(300);
+            strcat(texto," . ");
+            outtextxy((JANELA_X / 2) - 60, (JANELA_Y / 2) - 50, texto);
+            delay(100);
         }
-
-        }
-
+    }
 
     // Animação que aumenta a munição na tela
-    for (i = 0; i <= 5; i++)
+    for (quantidade = 0; quantidade <= 5; quantidade++)
     {
-        exibir(municao, i);
-        delay(200);
+        exibir(municao, quantidade);
+        delay(100);
     }
 
     // Variavel para monitorar a municao durante o jogo
