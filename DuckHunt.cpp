@@ -26,6 +26,7 @@ typedef struct
 
 void exibir(Elemento item, int quantidade);
 void exibirPontos(int pontos);
+void atualizarTimer(int segundos);
 void gerarInterfaceInicial();
 void aguardarInicio();
 void limparAlvos();
@@ -36,7 +37,6 @@ void telaFinal(int pontuacao[5]);
 void executarRodada(Estado *jogo);
 void aumentarPontos(Estado *jogo);
 void diminuirVidas(Elemento vida, Estado *jogo);
-void calcularTempoPassado(int *tempoLimite, int *tempoInicio);
 
 int main ()
 {
@@ -64,7 +64,7 @@ void gerarInterfaceInicial()
     setfillstyle(1, COLOR(20,20,20));
     bar(0, 0, JANELA_X, 30);
     setbkcolor(COLOR(20,20,20));
-    outtextxy(300, 8, "00:10");
+    outtextxy(300, 8, "01:00");
 
     // Alvo para iniciar o jogo
     setbkcolor(BLACK);
@@ -142,7 +142,7 @@ void iniciarJogo(int *pontuacao)
 
 void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
 {
-    int clickX, clickY, tempoInicio;
+    int clickX, clickY;
 
     Estado jogo;
 
@@ -167,11 +167,10 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
         // Para todo novo alvo em tela, o valor de acertou deverá ser falso;
         jogo.acertou = 0;
 
-        // TempoLimite = 0.5 segundos
-        jogo.tempoLimite = 50 * 16;
-        tempoInicio = clock();
+        // Tempo: 0.5 segundos
+        jogo.tempoLimite = 50;
 
-        while(jogo.tempoLimite > 0)
+        for(jogo.tempoLimite; jogo.tempoLimite >= 0; jogo.tempoLimite--)
         {
             if (jogo.vidas == 0) break;
             if (jogo.municao == 0) recarregarMunicao(&jogo.municao, municao);
@@ -194,11 +193,12 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
                 else diminuirVidas(vida, &jogo);
             }
 
-            calcularTempoPassado(&jogo.tempoLimite, &tempoInicio);
-        }
+            // Perde uma vida por não acertar o alvo a tempo
+            if (jogo.tempoLimite == 0 && jogo.acertou == 0) diminuirVidas(vida, &jogo);
 
-        // Perde uma vida por não acertar o alvo a tempo
-        if (jogo.acertou == 0) diminuirVidas(vida, &jogo);
+            // Delay para diminuir o tempo limite
+            delay(10);
+        }
     }
 
     *pontuacao = jogo.pontos;
@@ -291,13 +291,4 @@ void diminuirVidas(Elemento vida, Estado *jogo)
 {
     jogo->vidas--;
     exibir(vida, jogo->vidas);
-}
-
-void calcularTempoPassado(int *tempoLimite, int *tempoInicio)
-{
-    int tempoAtual = clock();
-    int tempoPassado = tempoAtual - *tempoInicio;
-
-    *tempoLimite -= tempoPassado;
-    *tempoInicio = tempoAtual;
 }
