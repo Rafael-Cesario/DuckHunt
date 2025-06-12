@@ -1,0 +1,13 @@
+Title: Tarefas
+
+- Feitas
+> Em progresso
+x Não feitas
+
+- Aumentar a dificuldade a cada partida
+> Mostrar a partida atual no topo da tela
+x Contagem regressiva entre partidas
+x Alvo bonus dourado
+x Tela Final
+
+

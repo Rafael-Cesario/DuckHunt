@@ -24,6 +24,13 @@ typedef struct
     int y;
 } Elemento;
 
+typedef struct
+{
+    char titulo[8];
+    int cor;
+    int tempoLimite;
+} Dificuldade;
+
 void exibir(Elemento item, int quantidade);
 void exibirPontos(int pontos);
 void atualizarTimer(int segundos);
@@ -31,16 +38,17 @@ void gerarInterfaceInicial();
 void aguardarInicio();
 void limparAlvos();
 void recarregarMunicao(int *jogoMunicao, Elemento municao);
-void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao);
+void jogo(int *pontuacao, Dificuldade dificuldade, Elemento alvo, Elemento vida, Elemento municao);
 void iniciarJogo(int *pontuacao);
-void telaFinal(int pontuacao[5]);
+void telaFinal(int pontuacao[3]);
 void executarRodada(Estado *jogo);
 void aumentarPontos(Estado *jogo);
 void diminuirVidas(Elemento vida, Estado *jogo);
+void reiniciarInterface(Elemento vida, Elemento municao);
 
 int main ()
 {
-    int pontuacao[5] = {0, 0, 0, 0, 0};
+    int pontuacao[3] = {0, 0, 0};
 
     initwindow(JANELA_X, JANELA_Y, "Duck Hunt", 100, 100);
 
@@ -60,11 +68,11 @@ void gerarInterfaceInicial()
     Elemento vida = {"Imagens/heart.jpg", 16, 393};
     Elemento municao = {"Imagens/bullet.jpg", 16, 430};
 
-    // Timer
+    // Partida Atual
     setfillstyle(1, COLOR(20,20,20));
     bar(0, 0, JANELA_X, 30);
     setbkcolor(COLOR(20,20,20));
-    outtextxy(300, 8, "01:00");
+    outtextxy(300, 8, "Partida 1");
 
     // Alvo para iniciar o jogo
     setbkcolor(BLACK);
@@ -111,36 +119,42 @@ void aguardarInicio()
 
 void iniciarJogo(int *pontuacao)
 {
-    int partidasTotal = 5, partidaAtual;
+    int partidaAtual = 0, partidasTotal = 3;
+
+    srand(time(NULL));
 
     Elemento alvo = {"Imagens/bullseye.jpg", 0, 0};
     Elemento vida = {"Imagens/heart.jpg", 16, 393};
     Elemento municao = {"Imagens/bullet.jpg", 16, 430};
 
-    srand(time(NULL));
+    Dificuldade facil = {"Fácil", 2, 100};
+    Dificuldade medio = {"Médio", 14, 70 };
+    Dificuldade dificil = {"Difícil", 4, 40};
 
-    for (partidaAtual = 0; partidaAtual < partidasTotal; partidaAtual++)
+    Dificuldade dificuldades[3] = { facil, medio, dificil };
+
+    for (partidaAtual; partidaAtual < partidasTotal; partidaAtual++)
     {
-        // Tarefa:
-        // Mostrar a partida atual no topo da tela
+        reiniciarInterface(vida, municao);
+        // ContagemRegressiva();
+        // exibirPartidaAtual();
 
-        // Reseta a interface antes de cada partida
-        exibir(vida, 5);
-        exibir(municao, 5);
-        exibirPontos(0);
+        // Atualiza a partida atual
+        char texto[11];
+        setfillstyle(1, COLOR(20,20,20));
+        bar(0, 0, JANELA_X, 30);
+        setbkcolor(COLOR(20,20,20));
+        sprintf(texto, "Partida: %d", partidaAtual + 1);
+        outtextxy(300, 8, texto);
 
-        // Tarefa:
-        // Exibir uma contagem regressiva na tela antes dos alvos começarem a aparecer
-        // contagemRegressiva();
-        limparAlvos();
         // Delay temporário, para simular a contagem regressiva
-        delay(3000);
+        delay(1000);
 
-        jogo(&pontuacao[partidaAtual], alvo, vida, municao);
+        jogo(&pontuacao[partidaAtual], dificuldades[partidaAtual], alvo, vida, municao);
     }
 }
 
-void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
+void jogo(int *pontuacao, Dificuldade dificuldade, Elemento alvo, Elemento vida, Elemento municao)
 {
     int clickX, clickY;
 
@@ -167,8 +181,8 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
         // Para todo novo alvo em tela, o valor de acertou deverá ser falso;
         jogo.acertou = 0;
 
-        // Tempo: 0.5 segundos
-        jogo.tempoLimite = 50;
+        // Tempo limite de acordo com a dificuldade atual
+        jogo.tempoLimite = dificuldade.tempoLimite;
 
         for(jogo.tempoLimite; jogo.tempoLimite >= 0; jogo.tempoLimite--)
         {
@@ -204,12 +218,12 @@ void jogo(int *pontuacao, Elemento alvo, Elemento vida, Elemento municao)
     *pontuacao = jogo.pontos;
 }
 
-void telaFinal(int pontuacao[5])
+void telaFinal(int pontuacao[3])
 {
     // Tarefa:
     // Tela Final
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 3; i++)
         printf("Pontuacao %d: %d\n", i, pontuacao[i]);
 
     clearviewport();
@@ -291,4 +305,12 @@ void diminuirVidas(Elemento vida, Estado *jogo)
 {
     jogo->vidas--;
     exibir(vida, jogo->vidas);
+}
+
+void reiniciarInterface(Elemento vida, Elemento municao)
+{
+    exibir(vida, 5);
+    exibir(municao, 5);
+    exibirPontos(0);
+    limparAlvos();
 }
