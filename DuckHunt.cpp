@@ -81,6 +81,10 @@ void gerarInterfaceInicial()
     outtextxy(224, 161, "Acerte o alvo para começar");
     readimagefile("Imagens/bullseye.jpg", 291, 190, 291 + 50, 190 + 50);
 
+    // Background na parte suerior
+    setfillstyle(1, COLOR(20,20,20));
+    bar(0, 0, JANELA_X, 30);
+
     // Background na parte inferior
     setfillstyle(1, COLOR(20,20,20));
     bar(0, 370, JANELA_X, 370 + 110);
@@ -138,22 +142,35 @@ void iniciarJogo(int *pontuacao)
     for (partidaAtual; partidaAtual < partidasTotal; partidaAtual++)
     {
         reiniciarInterface(vida, municao);
-        // ContagemRegressiva();
-        // exibirPartidaAtual();
 
+        // ContagemRegressiva();
+        for(int i=3; i>0; i--)
+        {
+            char texto1[10];
+            char tempo[6];
+            setbkcolor(BLACK);
+            sprintf(texto1,"Partida: %d",partidaAtual +1);
+            outtextxy(285,161,texto1);
+            sprintf(tempo,"%d",i);
+            outtextxy(308,190,tempo);
+            delay(1000);
+        }
+
+        // exibirPartidaAtual();
         // Atualiza a partida atual
         char texto[11];
-        setfillstyle(1, COLOR(20,20,20));
-        bar(0, 0, JANELA_X, 30);
         setbkcolor(COLOR(20,20,20));
         sprintf(texto, "Partida: %d", partidaAtual + 1);
         outtextxy(300, 8, texto);
 
-        // Delay temporário, para simular a contagem regressiva
-        delay(1000);
 
         jogo(&pontuacao[partidaAtual], dificuldades[partidaAtual], alvo, vida, municao);
+
+        setbkcolor(COLOR(20,20,20));
+        bar(300,8,300+65,8+15);
     }
+
+
 }
 
 void jogo(int *pontuacao, Dificuldade dificuldade, Elemento alvo, Elemento vida, Elemento municao)
@@ -311,6 +328,7 @@ void diminuirVidas(Elemento vida, Estado *jogo)
 
 void reiniciarInterface(Elemento vida, Elemento municao)
 {
+
     exibir(vida, 5);
     exibir(municao, 5);
     exibirPontos(0);
