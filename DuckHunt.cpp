@@ -5,6 +5,8 @@
 
 #define JANELA_X 640
 #define JANELA_Y 480
+#define LIMITE_AREA_ALVO_X (640 - 50)
+#define LIMITE_AREA_ALVO_Y (370 - 50 - 30) + 30
 
 typedef struct
 {
@@ -72,7 +74,7 @@ void gerarInterfaceInicial()
     setfillstyle(1, COLOR(20,20,20));
     bar(0, 0, JANELA_X, 30);
     setbkcolor(COLOR(20,20,20));
-    outtextxy(300, 8, "Partida 1");
+    outtextxy(300, 8, "Partida:  ");
 
     // Alvo para iniciar o jogo
     setbkcolor(BLACK);
@@ -171,8 +173,8 @@ void jogo(int *pontuacao, Dificuldade dificuldade, Elemento alvo, Elemento vida,
         if (jogo.vidas == 0) break;
 
         // Gera um x e y aleatório, considerando a área útil e o tamanho do alvo
-        alvo.x = rand() % (640 - 50);
-        alvo.y = rand() % (370 - 50 - 30) + 30;
+        alvo.x = rand() % LIMITE_AREA_ALVO_X; // (640 - 50)
+        alvo.y = rand() % LIMITE_AREA_ALVO_Y; // (370 - 50 - 30) + 30
 
         // Limpa o alvo anterior, e posiciona um novo
         limparAlvos();
