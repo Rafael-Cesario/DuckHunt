@@ -58,10 +58,11 @@ void reiniciarInterface(Elemento vida, Elemento municao);
 void contagemRegressiva(int partidaAtual);
 void exibirPartidaAtual(int partidaAtual);
 void contagemRegressiva(int numeroPartidaAtual, Dificuldade dificuldade);
+int encontrarPartidaMaiorPontuacao(int pontuacao[3]);
 
 int main ()
 {
-    int pontuacao[3] = {10, 15, 13};
+    int pontuacao[3] = {2, 4, 15};
 
     initwindow(JANELA_X, JANELA_Y, "Tiro ao Alvo", 100, 100);
 
@@ -356,25 +357,33 @@ void contagemRegressiva(int numeroPartidaAtual, Dificuldade dificuldade)
 
 void telaFinal(int pontuacao[3])
 {
-    int partidaAtual;
+    char textoPontuacao[15], textoMaiorPontuacao[52];
+    int partidaAtual, partidaMaiorPontuacao;
     int margem = 30;
-    char textoPontuacao[100];
 
     for (partidaAtual = 0; partidaAtual < 3; partidaAtual++)
     {
-        sprintf(textoPontuacao, "Partida %d: %d", partidaAtual + 1, pontuacao[partidaAtual]);
-        outtextxy(270, 50 + margem * partidaAtual, textoPontuacao);
+        sprintf(textoPontuacao, "Partida %d: %02d", partidaAtual + 1, pontuacao[partidaAtual]);
+        outtextxy(280, 50 + margem * partidaAtual, textoPontuacao);
     }
 
-    // encontrarMaiorPontuacao(pontuacao);
+    partidaMaiorPontuacao = encontrarPartidaMaiorPontuacao(pontuacao);
+
+    sprintf(textoMaiorPontuacao, "Sua maior pontuação foi na partida %d com %d pontos",
+            partidaMaiorPontuacao + 1, pontuacao[partidaMaiorPontuacao]);
+
+    readimagefile("./Imagens/trophy.jpg", 288, 192, 288 + 64, 192 + 64);
+    outtextxy(140, 270, textoMaiorPontuacao);
 }
 
+int encontrarPartidaMaiorPontuacao(int pontuacao[3])
+{
+    int partida;
+    int partidaMaiorPontuacao = 0;
 
+    for (partida = 0; partida < 3; partida++)
+        if (pontuacao[partida] > pontuacao[partidaMaiorPontuacao])
+            partidaMaiorPontuacao = partida;
 
-
-
-
-
-
-
-
+    return partidaMaiorPontuacao;
+}
