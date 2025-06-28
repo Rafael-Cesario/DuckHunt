@@ -43,7 +43,6 @@ typedef struct
 
 void exibir(Elemento item, int quantidade);
 void exibirPontos(int pontos);
-void atualizarTimer(int segundos);
 void gerarInterfaceInicial();
 void aguardarInicio();
 void limparAlvos();
@@ -51,11 +50,9 @@ void recarregarMunicao(int *jogoMunicao, Elemento municao);
 void jogo(int *pontuacao, Dificuldade dificuldade, Elemento vida, Elemento municao);
 void iniciarJogo(int *pontuacao);
 void telaFinal(int pontuacao[3]);
-void executarRodada(Estado *jogo);
 void aumentarPontos(Estado *jogo, int valor);
 void diminuirVidas(Elemento vida, Estado *jogo);
 void reiniciarInterface(Elemento vida, Elemento municao);
-void contagemRegressiva(int partidaAtual);
 void exibirPartidaAtual(int partidaAtual);
 void contagemRegressiva(int numeroPartidaAtual, Dificuldade dificuldade);
 int encontrarPartidaMaiorPontuacao(int pontuacao[3]);
@@ -66,9 +63,9 @@ int main ()
 
     initwindow(JANELA_X, JANELA_Y, "Tiro ao Alvo", 100, 100);
 
-    // gerarInterfaceInicial();
-    // aguardarInicio();
-    // iniciarJogo(pontuacao);
+    gerarInterfaceInicial();
+    aguardarInicio();
+    iniciarJogo(pontuacao);
     telaFinal(pontuacao);
 
     getch();
@@ -360,6 +357,8 @@ void telaFinal(int pontuacao[3])
     char textoPontuacao[15], textoMaiorPontuacao[52];
     int partidaAtual, partidaMaiorPontuacao;
     int margem = 30;
+
+    clearviewport();
 
     for (partidaAtual = 0; partidaAtual < 3; partidaAtual++)
     {
