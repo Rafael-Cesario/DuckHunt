@@ -5,9 +5,8 @@ Title: Tarefas
 x Não feitas
 
 - Aumentar a dificuldade a cada partida
-> Mostrar a partida atual no topo da tela
-x Contagem regressiva entre partidas
+- Mostrar a partida atual no topo da tela
+- Contagem regressiva entre partidas
 - Alvo bonus dourado
 x Tela Final
-
 

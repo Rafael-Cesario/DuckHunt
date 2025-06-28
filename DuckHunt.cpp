@@ -57,6 +57,7 @@ void diminuirVidas(Elemento vida, Estado *jogo);
 void reiniciarInterface(Elemento vida, Elemento municao);
 void contagemRegressiva(int partidaAtual);
 void exibirPartidaAtual(int partidaAtual);
+void contagemRegressiva(int numeroPartidaAtual, Dificuldade dificuldade);
 
 int main ()
 {
@@ -156,25 +157,7 @@ void iniciarJogo(int *pontuacao)
     for (partidaAtual; partidaAtual < partidasTotal; partidaAtual++)
     {
         reiniciarInterface(vida, municao);
-
-        // contagemRegressiva();
-        char texto1[10];
-        char tempo[6];
-
-        for(int i = 3; i > 0; i--)
-        {
-            setbkcolor(BLACK);
-            sprintf(texto1, "Partida: %d", partidaAtual +1);
-            outtextxy(285, 161, texto1);
-            sprintf(tempo,"%d", i);
-            outtextxy(308, 190, tempo);
-
-            delay(1000);
-        }
-
-        setbkcolor(COLOR(20,20,20));
-        bar(300,8,300+65,8+15);
-
+        contagemRegressiva(partidaAtual, dificuldades[partidaAtual]);
         exibirPartidaAtual(partidaAtual);
         jogo(&pontuacao[partidaAtual], dificuldades[partidaAtual], vida, municao);
     }
@@ -202,8 +185,6 @@ void jogo(int *pontuacao, Dificuldade dificuldade, Elemento vida, Elemento munic
 
     for(jogo.alvosExibidos; jogo.alvosExibidos < jogo.alvosPorPartida; jogo.alvosExibidos++)
     {
-        limparAlvos();
-
         if (jogo.vidas == 0) break;
 
         if (jogo.alvosExibidos == alvoSorteado) alvoAtual = alvoDourado;
@@ -250,6 +231,8 @@ void jogo(int *pontuacao, Dificuldade dificuldade, Elemento vida, Elemento munic
             // Delay para diminuir o tempo limite
             delay(10);
         }
+
+        limparAlvos();
     }
 
     *pontuacao = jogo.pontos;
@@ -360,3 +343,37 @@ void exibirPartidaAtual(int partidaAtual)
     sprintf(texto, "Partida: %d", partidaAtual + 1);
     outtextxy(300, 8, texto);
 }
+
+void contagemRegressiva(int numeroPartidaAtual, Dificuldade dificuldade)
+{
+    char textoPartidaAtual[11];
+    char tempo[2];
+    int i;
+
+    setcolor(dificuldade.cor);
+    outtextxy(280, 130, dificuldade.titulo);
+
+    setcolor(WHITE);
+    sprintf(textoPartidaAtual, "Partida: %d", ++numeroPartidaAtual);
+    outtextxy(280, 160, textoPartidaAtual);
+
+    for (i = 3; i > 0; i--)
+    {
+        sprintf(tempo, "%d", i);
+        outtextxy(308, 190, tempo);
+        delay(1000);
+    }
+
+    setfillstyle(1, BLACK);
+    bar(280, 130, 350, 210);
+}
+
+
+
+
+
+
+
+
+
+
