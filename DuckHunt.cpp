@@ -61,13 +61,13 @@ void contagemRegressiva(int numeroPartidaAtual, Dificuldade dificuldade);
 
 int main ()
 {
-    int pontuacao[3] = {0, 0, 0};
+    int pontuacao[3] = {10, 15, 13};
 
-    initwindow(JANELA_X, JANELA_Y, "Duck Hunt", 100, 100);
+    initwindow(JANELA_X, JANELA_Y, "Tiro ao Alvo", 100, 100);
 
-    gerarInterfaceInicial();
-    aguardarInicio();
-    iniciarJogo(pontuacao);
+    // gerarInterfaceInicial();
+    // aguardarInicio();
+    // iniciarJogo(pontuacao);
     telaFinal(pontuacao);
 
     getch();
@@ -238,20 +238,6 @@ void jogo(int *pontuacao, Dificuldade dificuldade, Elemento vida, Elemento munic
     *pontuacao = jogo.pontos;
 }
 
-void telaFinal(int pontuacao[3])
-{
-    // Tarefa:
-    // Tela Final
-
-    for (int i = 0; i < 3; i++)
-        printf("Pontuacao %d: %d\n", i, pontuacao[i]);
-
-    clearviewport();
-    setbkcolor(BLACK);
-    setfillstyle(1, WHITE);
-    outtextxy(10, 10, "O jogo terminou");
-}
-
 void exibir(Elemento item, int quantidade)
 {
     int x, i = 0;
@@ -366,6 +352,21 @@ void contagemRegressiva(int numeroPartidaAtual, Dificuldade dificuldade)
 
     setfillstyle(1, BLACK);
     bar(280, 130, 350, 210);
+}
+
+void telaFinal(int pontuacao[3])
+{
+    int partidaAtual;
+    int margem = 30;
+    char textoPontuacao[100];
+
+    for (partidaAtual = 0; partidaAtual < 3; partidaAtual++)
+    {
+        sprintf(textoPontuacao, "Partida %d: %d", partidaAtual + 1, pontuacao[partidaAtual]);
+        outtextxy(270, 50 + margem * partidaAtual, textoPontuacao);
+    }
+
+    // encontrarMaiorPontuacao(pontuacao);
 }
 
 
