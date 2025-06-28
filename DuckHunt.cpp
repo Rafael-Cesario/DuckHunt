@@ -91,7 +91,7 @@ void gerarInterfaceInicial()
     outtextxy(224, 161, "Acerte o alvo para começar");
     readimagefile("Imagens/bullseye.jpg", 291, 190, 291 + 50, 190 + 50);
 
-    // Background na parte suerior
+    // Background na parte superior
     setfillstyle(1, COLOR(20,20,20));
     bar(0, 0, JANELA_X, 30);
 
@@ -109,7 +109,7 @@ void aguardarInicio()
     int clickX, clickY, x, y, centroX = 315, centroY = 215;
     int clickAlvo = 0;
 
-    while (!clickAlvo)
+    do
     {
         // Mantem o jogo parado, esperando por um clique
         while(!ismouseclick(WM_LBUTTONDOWN)) delay(10);
@@ -118,19 +118,22 @@ void aguardarInicio()
         getmouseclick(WM_LBUTTONDOWN, clickX, clickY);
         clearmouseclick(WM_LBUTTONDOWN);
 
-        // Verifica se o clique foi dentro do alvo
         x = clickX - centroX;
         y = clickY - centroY;
 
+        // Verifica se o clique foi dentro do alvo
         if( x * x + y * y <= 26 * 26)
         {
             // Remove a mensagem inicial e o alvo
             setfillstyle(1,BLACK);
             bar(224, 161, 224 + 180, 161 + 100);
             setfillstyle(1,BLACK);
-            break;
+
+            // Encerra o loop
+            clickAlvo = 1;
         }
     }
+    while (!clickAlvo);
 }
 
 void iniciarJogo(int *pontuacao)
@@ -187,6 +190,7 @@ void jogo(int *pontuacao, Dificuldade dificuldade, Elemento vida, Elemento munic
     Objeto alvoDourado = {"Imagens/bullseyeGolden.jpg", 5, 0, 0};
     Objeto alvoAtual;
 
+    // Struct para monitorar os eventos do jogo
     Estado jogo;
     jogo.vidas = 5;
     jogo.municao = 5;
