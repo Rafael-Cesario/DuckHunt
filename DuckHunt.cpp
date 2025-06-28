@@ -33,6 +33,14 @@ typedef struct
     int tempoLimite;
 } Dificuldade;
 
+typedef struct
+{
+    char caminho[27];
+    int valor;
+    int x;
+    int y;
+} Objeto;
+
 void exibir(Elemento item, int quantidade);
 void exibirPontos(int pontos);
 void atualizarTimer(int segundos);
@@ -40,13 +48,15 @@ void gerarInterfaceInicial();
 void aguardarInicio();
 void limparAlvos();
 void recarregarMunicao(int *jogoMunicao, Elemento municao);
-void jogo(int *pontuacao, Dificuldade dificuldade, Elemento alvo, Elemento vida, Elemento municao);
+void jogo(int *pontuacao, Dificuldade dificuldade, Elemento vida, Elemento municao);
 void iniciarJogo(int *pontuacao);
 void telaFinal(int pontuacao[3]);
 void executarRodada(Estado *jogo);
-void aumentarPontos(Estado *jogo);
+void aumentarPontos(Estado *jogo, int valor);
 void diminuirVidas(Elemento vida, Estado *jogo);
 void reiniciarInterface(Elemento vida, Elemento municao);
+void contagemRegressiva(int partidaAtual);
+void exibirPartidaAtual(int partidaAtual);
 
 int main ()
 {
@@ -129,13 +139,14 @@ void iniciarJogo(int *pontuacao)
 
     srand(time(NULL));
 
-    Elemento alvo = {"Imagens/bullseye.jpg", 0, 0};
+    // Elemento = { Caminho, x, y }
     Elemento vida = {"Imagens/heart.jpg", 16, 393};
     Elemento municao = {"Imagens/bullet.jpg", 16, 430};
 
+    // Dificuldade = { Titulo, Cor, TempoLimite }
     Dificuldade facil = {"Fácil", 2, 100};
-    Dificuldade medio = {"Médio", 14, 70 };
-    Dificuldade dificil = {"Difícil", 4, 40};
+    Dificuldade medio = {"Médio", 14, 80 };
+    Dificuldade dificil = {"Difícil", 4, 50};
 
     Dificuldade dificuldades[3] = { facil, medio, dificil };
 
@@ -143,62 +154,65 @@ void iniciarJogo(int *pontuacao)
     {
         reiniciarInterface(vida, municao);
 
-        // ContagemRegressiva();
-        for(int i=3; i>0; i--)
+        // contagemRegressiva();
+        char texto1[10];
+        char tempo[6];
+
+        for(int i = 3; i > 0; i--)
         {
-            char texto1[10];
-            char tempo[6];
             setbkcolor(BLACK);
-            sprintf(texto1,"Partida: %d",partidaAtual +1);
-            outtextxy(285,161,texto1);
-            sprintf(tempo,"%d",i);
-            outtextxy(308,190,tempo);
+            sprintf(texto1, "Partida: %d", partidaAtual +1);
+            outtextxy(285, 161, texto1);
+            sprintf(tempo,"%d", i);
+            outtextxy(308, 190, tempo);
+
             delay(1000);
         }
 
-        // exibirPartidaAtual();
-        // Atualiza a partida atual
-        char texto[11];
-        setbkcolor(COLOR(20,20,20));
-        sprintf(texto, "Partida: %d", partidaAtual + 1);
-        outtextxy(300, 8, texto);
-
-
-        jogo(&pontuacao[partidaAtual], dificuldades[partidaAtual], alvo, vida, municao);
-
         setbkcolor(COLOR(20,20,20));
         bar(300,8,300+65,8+15);
+
+        exibirPartidaAtual(partidaAtual);
+        jogo(&pontuacao[partidaAtual], dificuldades[partidaAtual], vida, municao);
     }
-
-
 }
 
-void jogo(int *pontuacao, Dificuldade dificuldade, Elemento alvo, Elemento vida, Elemento municao)
+void jogo(int *pontuacao, Dificuldade dificuldade, Elemento vida, Elemento municao)
 {
     int clickX, clickY;
+    int alvoSorteado;
+
+    // Objeto = { Caminho[27], valor, x, y }
+    Objeto alvo = {"Imagens/bullseye.jpg", 1, 0, 0};
+    Objeto alvoDourado = {"Imagens/bullseyeGolden.jpg", 5, 0, 0};
+    Objeto alvoAtual;
 
     Estado jogo;
-
     jogo.vidas = 5;
     jogo.municao = 5;
     jogo.pontos = 0;
     jogo.alvosExibidos = 0;
     jogo.alvosPorPartida = 10;
 
+    alvoSorteado = rand() % jogo.alvosPorPartida;
+
     for(jogo.alvosExibidos; jogo.alvosExibidos < jogo.alvosPorPartida; jogo.alvosExibidos++)
     {
+        limparAlvos();
+
         if (jogo.vidas == 0) break;
 
-        // Gera um x e y aleatório, considerando a área útil e o tamanho do alvo
-        alvo.x = rand() % LIMITE_AREA_ALVO_X; // (640 - 50)
-        alvo.y = rand() % LIMITE_AREA_ALVO_Y; // (370 - 50 - 30) + 30
-
-        // Limpa o alvo anterior, e posiciona um novo
-        limparAlvos();
-        readimagefile(alvo.caminho, alvo.x, alvo.y, alvo.x + 50, alvo.y + 50);
+        if (jogo.alvosExibidos == alvoSorteado) alvoAtual = alvoDourado;
+        else alvoAtual = alvo;
 
         // Para todo novo alvo em tela, o valor de acertou deverá ser falso;
         jogo.acertou = 0;
+
+        // Posiciona o alvo de forma aleatória
+        alvo.x = rand() % LIMITE_AREA_ALVO_X; // (640 - 50)
+        alvo.y = rand() % LIMITE_AREA_ALVO_Y; // (370 - 50 - 30) + 30
+
+        readimagefile(alvoAtual.caminho, alvo.x, alvo.y, alvo.x + 50, alvo.y + 50);
 
         // Tempo limite de acordo com a dificuldade atual
         jogo.tempoLimite = dificuldade.tempoLimite;
@@ -222,7 +236,7 @@ void jogo(int *pontuacao, Dificuldade dificuldade, Elemento alvo, Elemento vida,
                                && clickX <= alvo.x + 50
                                && clickY <= alvo.y + 50;
 
-                if (jogo.acertou) aumentarPontos(&jogo);
+                if (jogo.acertou) aumentarPontos(&jogo, alvoAtual.valor);
                 else diminuirVidas(vida, &jogo);
             }
 
@@ -313,9 +327,9 @@ void recarregarMunicao(int *jogoMunicao, Elemento municao)
     *jogoMunicao = 5;
 }
 
-void aumentarPontos(Estado *jogo)
+void aumentarPontos(Estado *jogo, int valor)
 {
-    jogo->pontos++;
+    jogo->pontos += valor;
     limparAlvos();
     exibirPontos(jogo->pontos);
 }
@@ -333,4 +347,12 @@ void reiniciarInterface(Elemento vida, Elemento municao)
     exibir(municao, 5);
     exibirPontos(0);
     limparAlvos();
+}
+
+void exibirPartidaAtual(int partidaAtual)
+{
+    char texto[11];
+    setbkcolor(COLOR(20,20,20));
+    sprintf(texto, "Partida: %d", partidaAtual + 1);
+    outtextxy(300, 8, texto);
 }
